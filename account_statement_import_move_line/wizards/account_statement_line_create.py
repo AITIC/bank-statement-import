@@ -54,8 +54,8 @@ class AccountStatementLineCreate(models.TransientModel):
     def _prepare_move_line_domain(self):
         self.ensure_one()
         domain = [
-            #("reconciled", "=", false),
-            #("account_id.internal_type", "in", ("payable", "receivable")),
+            ("reconciled", "=", False),
+            ("account_id.internal_type", "=", "liquidity"),
             ("company_id", "=", self.env.user.company_id.id),
         ]
         if self.journal_ids:
@@ -88,7 +88,6 @@ class AccountStatementLineCreate(models.TransientModel):
         if paylines:
             move_in_payment_ids = paylines.mapped("line_ids.id")
             domain += [("id", "in", move_in_payment_ids)]
-
 
         return domain
 
