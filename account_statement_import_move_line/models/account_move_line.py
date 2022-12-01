@@ -15,7 +15,7 @@ class AccountMoveLine(models.Model):
         elif self.credit > 0:
             amount = -self.credit
         vals = {
-            "name": self.name or "?",
+            "name": "/",
             "amount": amount,
             "partner_id": self.partner_id.id,
             "statement_id": statement.id,
