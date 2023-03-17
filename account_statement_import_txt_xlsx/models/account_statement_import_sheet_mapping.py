@@ -56,6 +56,11 @@ class AccountStatementImportSheetMapping(models.Model):
     )
     quotechar = fields.Char(string="Text qualifier", size=1, default='"')
     timestamp_format = fields.Char(string="Timestamp Format", required=True)
+    no_header = fields.Boolean(
+        "File does not contain header line",
+        help="When this occurs please indicate the column number in the Columns section "
+        "instead of the column name, considering that the first column is 0",
+    )
     timestamp_column = fields.Char(string="Timestamp column", required=True)
     currency_column = fields.Char(
         string="Currency column",
@@ -66,8 +71,15 @@ class AccountStatementImportSheetMapping(models.Model):
     )
     amount_column = fields.Char(
         string="Amount column",
-        required=True,
         help="Amount of transaction in journal's currency",
+    )
+    amount_debit_column = fields.Char(
+        string="Debit amount column",
+        help="Debit amount of transaction in journal's currency",
+    )
+    amount_credit_column = fields.Char(
+        string="Credit amount column",
+        help="Credit amount of transaction in journal's currency",
     )
     balance_column = fields.Char(
         string="Balance column",
@@ -129,6 +141,19 @@ class AccountStatementImportSheetMapping(models.Model):
         string="Bank Account column",
         help="Partner's bank account",
     )
+
+    _sql_constraints = [
+        (
+            "check_amount_columns",
+            (
+                "CHECK("
+                "amount_column IS NULL "
+                "OR (amount_debit_column IS NULL AND amount_credit_column IS NULL)"
+                ")"
+            ),
+            "Use amount_column OR (amount_debit_column AND amount_credit_column).",
+        ),
+    ]
 
     @api.onchange("float_thousands_sep")
     def onchange_thousands_separator(self):
